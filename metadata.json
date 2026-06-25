@@ -1,0 +1,6 @@
+{
+  "name": "Tutor Performance Dashboard",
+  "description": "An interactive tutor evaluation and performance analytics platform featuring real-time score breakdowns, trend charts, AI insights, and student feedback tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
