@@ -9,14 +9,83 @@ datasource db {
 }
 
 model Tutor {
-  id              String @id @default(cuid())
-  name            String
-  initials        String
-  subject         String
-  rating          Float
-  experienceYears Int
-  totalStudents   Int
-  overallScore    Int
-  email           String @unique
-  bio             String
+  id                String   @id @default(cuid())
+  name              String
+  initials          String
+  subject           String
+  rating            Float
+  experienceYears   Int
+  totalStudents     Int
+  overallScore      Int
+  email             String   @unique
+  bio               String
+
+  evaluations       Evaluation[]
+  performanceHistory PerformanceHistory[]
+  studentFeedbacks  StudentFeedback[]
+  aiSummaries       AISummary[]
+}
+
+model Evaluation {
+  id                 String   @id @default(cuid())
+
+  tutorId            String
+  tutor              Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  evaluationDate     DateTime @default(now())
+  evaluator          String
+
+  subjectKnowledge   Int
+  communication      Int
+  confidence         Int
+  studentEngagement  Int
+  conceptClarity     Int
+
+  overallScore       Int
+
+  remarks            String?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model PerformanceHistory {
+  id            String   @id @default(cuid())
+
+  tutorId       String
+  tutor         Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  month         String
+  year          Int
+
+  overallScore  Int
+
+  createdAt     DateTime @default(now())
+}
+
+model StudentFeedback {
+  id            String   @id @default(cuid())
+
+  tutorId       String
+  tutor         Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  studentName   String
+  rating        Int
+  comment       String
+
+  createdAt     DateTime @default(now())
+}
+
+model AISummary {
+  id               String   @id @default(cuid())
+
+  tutorId          String
+  tutor            Tutor    @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  strengths        String
+  improvements     String
+  recommendations  String
+  summary          String
+
+  createdAt        DateTime @default(now())
 }
