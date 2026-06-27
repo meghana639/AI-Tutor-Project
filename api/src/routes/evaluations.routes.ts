@@ -1,8 +1,17 @@
-import express from "express";
-import { getAllEvaluations } from "../controllers/evaluations.controller";
+import { Router } from "express";
 
-const router = express.Router();
+import {
+  getEvaluations,
+  getEvaluation,
+  createEvaluation,
+} from "../controllers/evaluations.controller";
 
-router.get("/", getAllEvaluations);
+const router = Router();
+
+router.get("/", getEvaluations);
+
+router.get("/:id", getEvaluation);
+
+router.post("/", createEvaluation);
 
 export default router;

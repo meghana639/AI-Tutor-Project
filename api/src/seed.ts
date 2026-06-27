@@ -72,7 +72,51 @@ async function main() {
     ]
   });
 
-  console.log("✅ Tutors seeded successfully!");
+  // Fetch all tutors
+  const tutors = await prisma.tutor.findMany();
+
+  // Seed evaluations
+  for (const tutor of tutors) {
+    await prisma.evaluation.createMany({
+      data: [
+        {
+          tutorId: tutor.id,
+          evaluator: "Admin",
+          subjectKnowledge: 92,
+          communication: 90,
+          confidence: 89,
+          studentEngagement: 91,
+          conceptClarity: 94,
+          overallScore: 91,
+          remarks: "Excellent classroom management."
+        },
+        {
+          tutorId: tutor.id,
+          evaluator: "Academic Head",
+          subjectKnowledge: 95,
+          communication: 93,
+          confidence: 92,
+          studentEngagement: 94,
+          conceptClarity: 96,
+          overallScore: 94,
+          remarks: "Very engaging teaching style."
+        },
+        {
+          tutorId: tutor.id,
+          evaluator: "Senior Mentor",
+          subjectKnowledge: 88,
+          communication: 90,
+          confidence: 91,
+          studentEngagement: 89,
+          conceptClarity: 90,
+          overallScore: 90,
+          remarks: "Needs slight improvement in pacing."
+        }
+      ]
+    });
+  }
+
+  console.log("✅ Tutors and Evaluations seeded successfully!");
 }
 
 main()

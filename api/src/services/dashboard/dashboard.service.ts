@@ -1,93 +1,77 @@
-export const getDashboardData = () => {
-  return {
-    id: "1",
-    name: "David Kim",
-    initials: "DK",
-    subject: "Organic Chemistry & Biology",
-    rating: 4.8,
-    experienceYears: 5,
-    totalStudents: 118,
+import { PrismaClient } from "../../generated/prisma/client";
 
-    overallScore: 84,
+const prisma = new PrismaClient();
+
+export const getDashboardData = async (tutorId: string) => {
+  // Fetch tutor
+  const tutor = await prisma.tutor.findUnique({
+    where: {
+      id: tutorId,
+    },
+  });
+
+  if (!tutor) {
+    return null;
+  }
+
+  // Fetch latest evaluation
+  const latestEvaluation = await prisma.evaluation.findFirst({
+    where: {
+      tutorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  // Fetch recent evaluations
+  const recentEvaluations = await prisma.evaluation.findMany({
+    where: {
+      tutorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 3,
+  });
+
+  return {
+    id: tutor.id,
+    name: tutor.name,
+    initials: tutor.initials,
+    subject: tutor.subject,
+    rating: tutor.rating,
+    experienceYears: tutor.experienceYears,
+    totalStudents: tutor.totalStudents,
+
+    overallScore: latestEvaluation?.overallScore ?? tutor.overallScore,
+
     performanceLabel: "Great",
     rankText: "Top 15% among all tutors this term",
     trendDelta: "+6",
 
     metrics: {
-      subjectKnowledge: 90,
-      communication: 86,
-      engagement: 88,
-      confidence: 82
+      subjectKnowledge: latestEvaluation?.subjectKnowledge ?? 0,
+      communication: latestEvaluation?.communication ?? 0,
+      engagement: latestEvaluation?.studentEngagement ?? 0,
+      confidence: latestEvaluation?.confidence ?? 0,
+      conceptClarity: latestEvaluation?.conceptClarity ?? 0,
     },
 
-    trend: [
-      { month: "Sep", score: 67 },
-      { month: "Oct", score: 70 },
-      { month: "Nov", score: 74 },
-      { month: "Dec", score: 76 },
-      { month: "Jan", score: 78 },
-      { month: "Feb", score: 80 },
-      { month: "Mar", score: 81 },
-      { month: "Apr", score: 84 }
-    ],
+    trend: [],
 
-    evaluations: [
-      {
-        id: "1",
-        studentName: "Chloe D.",
-        studentInitials: "CD",
-        date: "Apr 15",
-        subject: "Physics",
-        score: 92,
-        feedback: "Excellent explanation",
-        category: "Physics"
-      },
-      {
-        id: "2",
-        studentName: "Ethan W.",
-        studentInitials: "EW",
-        date: "Apr 12",
-        subject: "Calculus",
-        score: 85,
-        feedback: "Good engagement",
-        category: "Calculus"
-      }
-    ],
+    evaluations: recentEvaluations,
 
     aiInsights: {
-      mainQuote:
-        "David excels at student engagement and interactive problem solving during live lab reviews.",
-      retentionStat:
-        "Active engagement rate of 91% is 12 pts above science department median."
+      mainQuote: "",
+      retentionStat: "",
     },
 
-    strengths: [
-      {
-        title: "Interactive Demonstrations",
-        description:
-          "Frequently uses digital whiteboarding to sketch molecular pathways."
-      },
-      {
-        title: "Exam Preparation",
-        description:
-          "Students report 22% higher mock exam scores after 4 sessions."
-      }
-    ],
+    strengths: [],
 
-    improvements: [
-      {
-        title: "Session Summary Notes",
-        description:
-          "Some students request PDF cheat sheets post-meeting."
-      },
-      {
-        title: "Time Allocation",
-        description:
-          "Occasionally runs 5-10 minutes over scheduled time slots."
-      }
-    ],
+    improvements: [],
 
-    email: "david.kim@tutormetrics.com",
-    bio: "Senior chemistry and biology tutor."
+    email: tutor.email,
+    bio: tutor.bio,
   };
 };
